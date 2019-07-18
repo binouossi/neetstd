@@ -25,22 +25,12 @@ client::client(std::string conf, int prot=TCP):net(conf)
       this->peer_addr.sin_port = htons(PORT);
      this->peer_addr.sin_addr.s_addr = inet_addr( ADDR);
 
-/* to read address from file
-      const char* addr;
-      ADDR=this->getaddr(CONFIG).c_str();
-      this->serv_addr.sin_addr.s_addr = inet_addr(addr);*/
-
-//      printf("zozo");
 
       if(connect(this->sock, (struct sockaddr *)&this->peer_addr, sizeof(this->peer_addr))<0)
         {
           perror("Error : Connect Failed");
           exit(-1);
         }
-//      printf("fin");
-
-
-//    std::cout<<"kill"<<std::endl;
 
 
 }
@@ -67,7 +57,7 @@ client::~client()
 {
     if(close(this->sock)==0)
     {
- //       std::fprintf(OUTPUT,"connection ended\n" , strerror(errno));
+        std::fprintf(OUTPUT,"connection ended\n" , strerror(errno));
 
     }
 

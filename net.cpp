@@ -18,7 +18,6 @@ char* net::str_reader()
             return NULL;
         }
 
-    //    std::cout<<n<<std::endl;
         char lu[n];
 
     //    lu=(char*)std::realloc(lu,(n*sizeof(char)));
@@ -42,7 +41,6 @@ char* net::str_reader()
         }
         if(this->prot==UDP)
         {
-            int len;
                 a = recvfrom(this->sock, lu, n,
                             MSG_WAITALL, ( struct sockaddr *) &peer_addr,
                             NULL);
