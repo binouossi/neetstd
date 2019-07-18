@@ -1,29 +1,37 @@
 #ifndef NETSTD_SERVER_H
 #define NETSTD_SERVER_H
 
-#define ADDR
-#define OUTPUT stderr
-#define PORT 5000
+//#define ADDR
+//#define OUTPUT stderr
+
+#define THREAD 1
+#define PROCESS 0
+//#define PORT 5000
 
 // labrary
 #include <stdarg.h>
-#include <unistd.h>
-#include <string.h>
-#include <sstream>
-#include <fstream>
-#include <unistd.h>
+//#include <unistd.h>
+//#include <string.h>
+//#include <sstream>
+//#include <fstream>
+//#include <unistd.h>
 #include <arpa/inet.h>
+#include <pthread.h>
+#include <mutex>
+#include <vector>
 #include <wait.h>
 
 #include "net.h"
 
 #include "netstd_server_global.h"
 
-class NETSTDSHARED_EXPORT server : net
+class NETSTDSHARED_EXPORT server : public net
 {
 
 public:
-    server(void (*communicator)(server, va_list&), ...);
+    server(std::string conf,int prot,void *(*communicator)(server, va_list&), ...);
+
+    ~server();
 
 //    server();
 
@@ -38,6 +46,10 @@ public:
 
     template <typename Type>
     bool operator<<(Type &data);*/
+
+
+private:
+    int deamon;
 
 protected:
 

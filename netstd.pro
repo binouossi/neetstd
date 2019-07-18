@@ -25,13 +25,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     client.cpp \
     net.cpp \
-    server.cpp
+    server.cpp \
+    generique.cpp
 
 HEADERS +=\
         netstd_server_global.h \
     client.h \
     net.h \
-    server.h
+    server.h \
+    netstd.h \
+    generique.h
 
 unix {
     target.path = /usr/lib

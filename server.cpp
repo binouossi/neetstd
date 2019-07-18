@@ -1,66 +1,104 @@
 #include "server.h"
 
+
 int sigflag;
 
-int resquiescat(){wait(NULL);sigflag = 1;return 0;}
+int resquiescat(){wait(NULL);sigflag = 1;}
 
-server::server(void (communicator)(server, va_list&), ...)
+server::server(std::string conf, int prot,void* (communicator)(server, va_list&), ...):net(conf)
 {
-    int listenfd = 0;
+    this->prot=prot;
+    this->deamon=PROCESS;
 
-    va_list vars;
-    va_start(vars,communicator);
+//    std::cout<<std::length(va_list)<<std::endl;
+
+    int listenfd = 0;
 
       struct sockaddr_in serv_addr;
 
       sigset(SIGCHLD, (sighandler_t)resquiescat);
 
-      listenfd = socket(AF_INET, SOCK_STREAM, 0);// creation de la socket serveur
-      printf("socket retrieve success\n");
+     if((listenfd = socket(AF_INET, SOCK_STREAM, 0))<0) // creation de la socket serveur
+     {
+         perror("socket error in serveur");
+                   exit(-1);
+     }
+     
+//      printf("socket retrieve success\n");
 
       serv_addr.sin_family = AF_INET;
       serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-      serv_addr.sin_port = htons(PORT);
+      serv_addr.sin_port = htons(this->configuration.port);
 
       if(bind(listenfd, (struct sockaddr*)&serv_addr,sizeof(serv_addr))<0)
-      {// on attache la socket a l'address du serveur
-          perror("Face_server bind fail");
-          exit(1);
+      {
+          // on attache la socket a l'address du serveur
+          perror("server bind fail");
+          exit(-1);
       }
+//      printf("binded\n");
 
-      if(listen(listenfd, 10) == -1)
+      if(listen(listenfd, 10) <0)
       {// starting listen
           perror("Failed to listen\n");
-          exit(1);
+          exit(-1);
       }
+ //r     printf("listening\n");
 
-      while(1)
+      va_list vars;
+      va_start(vars,communicator);
+
+      while(true)
         {
+
           sigflag = 0;
-          int childpid;
+
+          static int i=0;
+
           // accept awaiting request
-          this->sock = accept(listenfd, (struct sockaddr*)NULL ,NULL);
-          if(this->sock<0)
+          if((this->sock = accept(listenfd, (struct sockaddr*)NULL ,NULL))<0)
           {
               if(sigflag == 1)continue;
-              perror("accept error in Face_serverd");
-              exit(1);
+              perror("Accept error in server:");
+              exit(-1);
           }
 
-          if((childpid = fork()) < 0)
+          if(this->deamon==PROCESS)
           {
-              perror("fork error in Face_serveurd");
-              exit(1);
-          }
-          else if (childpid == 0)
-          {
-              close(listenfd);
-            (*communicator)(*this, vars);
-          }
+              int childpid;
 
-          close(this->sock);
+              if((childpid = fork()) < 0)
+              {
+                  perror("Fork error in serveur:");
+                  exit(-1);
+              }
+              else if(childpid == 0){
+
+                  printf("forked");
+//                  std::string msg;
+                  close(listenfd);
+//                  *this>>msg;
+    //              printf("done\n");
+//                  printf(msg.c_str());
+//                  printf((*this<<"la vie").c_str());
+                  exit(0);
+                (*communicator)(*this, vars);
+              }
+              close(this->sock);
+
+          }
+          else if(this->deamon==THREAD)
+          {
+   //           std::vector<pthread_t> threads(10);
+
+//              pthread_create(&threads[i], NULL,(communicator)(*this, vars), NULL);
+
+//              pthread_join(threads[i], NULL);
+              i++;
+          }
        }
       va_end(vars);
+
 }
 
 /*char* server::str_reader()
@@ -362,3 +400,11 @@ int server::readLine(char data[],int maxlen)
    }
 }
 */
+
+
+
+server::~server()
+{
+
+    return;
+}

@@ -1,23 +1,38 @@
 #ifndef NET_H
 #define NET_H
 
+
+
 #define OUTPUT stderr
+
+#define THREAD 1
+#define PROCESS 0
+
+#define TCP 0
+#define UDP 1
+
+#define CONFIG "/etc/Face_client" //just for who those want to use a config file to manage server's information
+
 
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <fstream>
 #include <string.h>
 #include <sstream>
+#include<iostream>
+#include"generique.h"
 
-class net
+
+class net// : public istringstream
 {
 public:
 
+    net(std::string);
     template <typename Type>
-    bool operator<<(Type &data);
+    std::string operator<<(Type data);
 
     template <typename Type>
-    std::stringstream& operator>>(Type &data);
+    std::string operator>>(Type& data);
 
 
 
@@ -33,7 +48,14 @@ protected:
 
     int str_sender(char *fi);
 
+    con configuration;
+
+    struct sockaddr_in local_addr;
+
+    struct sockaddr_in peer_addr;
+
     int sock;
+    int prot;
 
 
 
@@ -49,12 +71,15 @@ private:
 
     int str_sender(char* fi, int size);
 
+
+
+
 };
 
 
 
 template <typename Type>
-std::stringstream& net::operator>> (Type& don)
+std::string net::operator>> (Type& don)
 {
     int size=NULL;
 
@@ -66,15 +91,17 @@ std::stringstream& net::operator>> (Type& don)
 
     char* data= this->str_reader(size);
 
+//    std::cout<<data<<std::endl;
+
     nin<<data;
 
     nin>>don;
 
-    return nin;
+    return nin.str();
 }
 
 template <typename Type>
-bool net::operator<<(Type &data)
+std::string net::operator<<(Type data)
 {
     std::stringstream nout;
 
@@ -84,12 +111,15 @@ bool net::operator<<(Type &data)
 
     int size=strlen(buf);
 
+    std::cout<<buf<<std::endl;
+
     if(this->str_sender(buf,size)<0)
     {
-        return false;
+        buf=NULL;
+        return buf;
     }
 
-    return true;
+    return buf;
 }
 
 

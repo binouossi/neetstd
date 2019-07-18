@@ -4,26 +4,25 @@
 
 #define ADDR "127.0.0.1"
 #define PORT 5000
-#define CONFIG "/etc/Face_client" //just for who those want to use a config file to manage server's information
 
 #include"net.h"
 
 #include "netstd_server_global.h"
 
-class NETSTDSHARED_EXPORT client : net
+class NETSTDSHARED_EXPORT client : public net
 {
 
 public:
-    client();
+    client(std::string conf ,int prot);
 
     ~client();
 
 
-//private:
+private:
   //  int sock;
 
 protected:
-    struct sockaddr_in serv_addr;
+//    struct sockaddr_in serv_addr;
 
     std::string get_addr(char* path);
 

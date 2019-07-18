@@ -1,182 +1,289 @@
 #include "net.h"
 
-/*net::net(int sock)
-{
-    this->sock=sock;
-}
-*/
 
+
+net::net(std::string conf)
+{
+    this->configuration=nt_config(conf);
+}
 
 char* net::str_reader()
 {
 
-    int n = NULL;
-    this->int_reader(&n);
+        int n = NULL;
+        this->int_reader(&n);
 
-    if(n==0||n==NULL)
-    {
-        return NULL;
-    }
+        if(n==0||n==NULL)
+        {
+            return NULL;
+        }
 
-//    std::cout<<n<<std::endl;
-    char lu[n];
+    //    std::cout<<n<<std::endl;
+        char lu[n];
 
-//    lu=(char*)std::realloc(lu,(n*sizeof(char)));
+    //    lu=(char*)std::realloc(lu,(n*sizeof(char)));
 
-    if(lu==NULL)
-    {
-        std::fprintf(OUTPUT,"Allocation error" , strerror(errno));
+        if(lu==NULL)
+        {
+            std::fprintf(OUTPUT,"Allocation error" , strerror(errno));
 
-        return NULL;
-    }
+            return NULL;
+        }
 
-    lu[0]='\0';
+        lu[0]='\0';
 
-//    int a=this->readLine(lu,n);
+    //    int a=this->readLine(lu,n);
+        int a;
 
-    int a=recv(this->sock,lu,n,0);
+        if(this->prot==TCP)
+        {
 
-      if( a < n-1)
-      {
-          std::fprintf(OUTPUT,"Read Error" , strerror(errno));
+            a=recv(this->sock,lu,n,0);
+        }
+        if(this->prot==UDP)
+        {
+            int len;
+                a = recvfrom(this->sock, lu, n,
+                            MSG_WAITALL, ( struct sockaddr *) &peer_addr,
+                            NULL);
+        }
 
-        return NULL;
-      }
+          if( a < n-1)
+          {
+              std::fprintf(OUTPUT,"Read Error" , strerror(errno));
 
-      lu[n]='\0';
-      return lu;
+            return NULL;
+          }
+
+          lu[n]='\0';
+          return lu;
+
 }
 
 char* net::str_reader(int n)
 {
-
-    char* lu=NULL;
-
-    if(n==0||n==NULL)
+    if(this->prot==TCP)
     {
-        return NULL;
+
+        char* lu=NULL;
+
+        if(n==0||n==NULL)
+        {
+            return NULL;
+        }
+
+        lu=(char*)std::realloc(lu,(n*sizeof(char)));
+
+        if(lu==NULL)
+        {
+            std::fprintf(OUTPUT,"Allocation error" , strerror(errno));
+
+            return NULL;
+        }
+
+        lu[0]='\0';
+
+    //    int a=this->readLine(lu,n);
+        int a;
+
+        if(this->prot==TCP)
+        {
+
+            a=recv(this->sock,lu,n,0);
+        }
+        if(this->prot==UDP)
+        {
+            int len;
+                a = recvfrom(this->sock, lu, n,
+                            MSG_WAITALL, ( struct sockaddr *) &peer_addr,
+                            NULL);
+        }
+
+          if( a < n-1)
+          {
+
+              std::fprintf(OUTPUT,"Read Error" , strerror(errno));
+
+            return NULL;
+          }
+
+          lu[n]='\0';
+          return lu;
+
     }
 
-    lu=(char*)std::realloc(lu,(n*sizeof(char)));
-
-    if(lu==NULL)
+    if(this->prot==UDP)
     {
-        std::fprintf(OUTPUT,"Allocation error" , strerror(errno));
 
-        return NULL;
     }
-
-    lu[0]='\0';
-
-//    int a=this->readLine(lu,n);
-
-    int a=recv(this->sock,lu,n,0);
-
-
-      if( a < n-1)
-      {
-
-          std::fprintf(OUTPUT,"Read Error" , strerror(errno));
-
-        return NULL;
-      }
-
-      lu[n]='\0';
-      return lu;
 }
 
 int net::str_sender(char* fi)
 {
+    if(this->prot==TCP)
+    {
 
-    int a=strlen(fi);
+        int a=strlen(fi);
 
-    this->int_sender(strlen(fi));
+        this->int_sender(strlen(fi));
 
-    int n=send(this->sock,fi,a,0);
+        int n=send(this->sock,fi,a,0);
 
-    if(n<0)
-        perror("Error while sending");
-    return n;
+        if(n<0)
+            perror("Error while sending");
+        return n;
+    }
+
+    if(this->prot==UDP)
+    {
+
+    }
+
 }
 
 int net::str_sender(char* fi,int size)
 {
-    this->int_sender(size);
 
-    int n=send( this->sock , fi , size, 0 );
 
-    if(n<0)
-        perror("Error while sending");
-    return n;
+        this->int_sender(size);
+    int n;
+    if(this->prot==TCP)
+    {
+        n=send( this->sock , fi , size, 0 );
+    }else
+        if(this->prot==UDP)
+        {
+            n=sendto(this->sock, fi, size,
+                     MSG_CONFIRM, (const struct sockaddr *) &this->peer_addr,
+                         NULL);
+        }
+
+        if(n<0)
+            perror("Error while sending");
+        return n;
+
 }
 
 int net::int_reader(int* num)
 {
-    char buf[10] = "";
 
-    int rest=recv( this->sock , buf , sizeof buf , 0 );
+    if(this->prot==TCP)
+    {
 
-    sscanf( buf , "%d" , num );
+        char buf[10] = "";
 
-    return rest;
+        int rest=recv( this->sock , buf , sizeof buf , 0 );
+
+        sscanf( buf , "%d" , num );
+
+        return rest;
+    }
+
+    if(this->prot==UDP)
+    {
+
+    }
+
+
 }
 
 int net::int_sender(int num)
 {
-    char buf[10] = "";
 
-    sprintf( buf , "%d" , num );
+    if(this->prot==TCP)
+    {
 
-    int rest=send( this->sock , buf , sizeof buf , 0 );
+        char buf[10] = "";
 
-    return rest;
+        sprintf( buf , "%d" , num );
+
+        int rest=send( this->sock , buf , sizeof buf , 0 );
+
+        return rest;
+    }
+
+    if(this->prot==UDP)
+    {
+
+    }
+
+
 }
 
 int net::file_sender(char* path)
 {
-
-    std::fstream file(path);
-
-        std::stringstream hi;
-    if(file.is_open())
+    if(this->prot==TCP)
     {
 
-        hi<<file.rdbuf();
+        std::fstream file(path);
 
-        file.close();
+            std::stringstream hi;
+        if(file.is_open())
+        {
+
+            hi<<file.rdbuf();
+
+            file.close();
+        }
+        else
+            return -2;
+        std::string kol=hi.str();
+
+    char* bi=const_cast<char*>(kol.c_str());
+
+        if(this->str_sender(bi)<0)
+            return -1;
+
+         return 0;
     }
-    else
-        return -2;
-    std::string kol=hi.str();
 
-char* bi=const_cast<char*>(kol.c_str());
+    if(this->prot==UDP)
+    {
 
-    if(this->str_sender(bi)<0)
-        return -1;
+    }
 
-     return 0;
 }
 
 bool net::file_reader(char* destination)
 {
 
-    char*gi=this->getall();
-
-    std::ofstream file(destination);
-
-    if(!file.is_open())
+    if(this->prot==TCP)
     {
-        return false;
+
+        char*gi=this->getall();
+
+        std::ofstream file(destination);
+
+        if(!file.is_open())
+        {
+            return false;
+        }
+
+        file<<gi;
+
+        return true;
+
     }
 
-    file<<gi;
+    if(this->prot==UDP)
+    {
 
-    return true;
+    }
 
 }
 
 char* net::getall()
 {
+    if(this->prot==TCP)
+    {
+
+    }
+
+    if(this->prot==UDP)
+    {
+
+    }
+
     int size=NULL;
 
     this->int_reader(&size);
@@ -190,3 +297,4 @@ char* net::getall()
 
     return data;
 }
+
