@@ -33,8 +33,8 @@ HEADERS +=\
     client.h \
     net.h \
     server.h \
-    netstd.h \
-    generique.h
+    generique.h \
+    ntstd.h
 
 unix {
     target.path = /usr/lib
