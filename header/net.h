@@ -5,14 +5,16 @@
 
 #define OUTPUT stderr
 
-#define THREAD 1
-#define PROCESS 0
+constexpr int IPV4 = 4;
+constexpr int IPV6 = 6;
 
-#define TCP 0
-#define UDP 1
+constexpr char* TCP = "TCP";
+constexpr char* UDP = "UDP";
 
-#define CONFIG "/etc/Face_client" //just for who those want to use a config file to manage server's information
 
+
+
+//library list
 
 #include <arpa/inet.h>
 #include <unistd.h>
@@ -20,8 +22,22 @@
 #include <string.h>
 #include <sstream>
 #include<iostream>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
+
+
+//local header
+
+#include"addr.h"
 #include"generique.h"
 
+
+typedef enum family{
+    ipv4=4,
+    ipv6=6
+}family;
 
 class net// : public istringstream
 {
@@ -48,14 +64,32 @@ protected:
 
     int str_sender(char *fi);
 
+    auto get_addr_l();//return address usefull for socket struct
+
+
     con configuration;
 
-    struct sockaddr_in local_addr;
+    char ip;
 
-    struct sockaddr_in peer_addr;
+    //addr
+    sockaddr_storage *peer_addr;
+    sockaddr_storage *local_addr;
+
+
+//ipv4 address
+   struct sockaddr_in local_addr4;
+
+    struct sockaddr_in peer_addr4;
+
+    //ipv6 address
+    struct sockaddr_in6 local_addr6;
+
+    struct sockaddr_in6 peer_addr6;
+
+
 
     int sock;
-    int prot;
+    std::string prot;
 
 
 
@@ -99,6 +133,7 @@ std::string net::operator>> (Type& don)
 
     return nin.str();
 }
+
 
 template <typename Type>
 std::string net::operator<<(Type data)

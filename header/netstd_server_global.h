@@ -3,10 +3,10 @@
 
 //#include <QtCore/qglobal.h>
 
-#if defined(NETSTD_LIBRARY)
-#  define NETSTDSHARED_EXPORT// Q_DECL_EXPORT
+#if defined(NTSTD_LIBRARY)
+#  define NTSTDSHARED_EXPORT// Q_DECL_EXPORT
 #else
-#  define NETSTDSHARED_EXPORT// Q_DECL_IMPORT
+#  define NTSTDSHARED_EXPORT// Q_DECL_IMPORT
 #endif
 
 #endif // NETSTD_GLOBAL_H

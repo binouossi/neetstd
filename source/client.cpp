@@ -1,7 +1,7 @@
 #include "client.h"
 
 
-client::client(std::string conf, int prot=TCP):net(conf)
+client::client(std::string conf= "$\/\no data", std::string prot=TCP):net(conf)
 {
     this->prot=prot;
 
@@ -21,12 +21,19 @@ client::client(std::string conf, int prot=TCP):net(conf)
               }
         }
 
-      this->peer_addr.sin_family = AF_INET;
-      this->peer_addr.sin_port = htons(PORT);
-     this->peer_addr.sin_addr.s_addr = inet_addr( ADDR);
+    //this->peer_addr.sin=AF_INET;
+    //this->peer_addr.
+
+//    this->peer_addr.sin6_family=AF_INET;
 
 
-      if(connect(this->sock, (struct sockaddr *)&this->peer_addr, sizeof(this->peer_addr))<0)
+    //this->peer_addr.local._4.sin_family;
+
+      this->peer_addr4.sin_family = AF_INET;
+      this->peer_addr4.sin_port = htons(this->configuration.port);
+      this->peer_addr4.sin_addr.s_addr = inet_addr( this->configuration.addr );
+
+      if(connect(this->sock, (struct sockaddr *)&this->peer_addr4, sizeof(this->peer_addr4))<0)
         {
           perror("Error : Connect Failed");
           exit(-1);
@@ -34,6 +41,10 @@ client::client(std::string conf, int prot=TCP):net(conf)
 
 
 }
+
+
+
+
 
 std::string client::get_addr(char* path)
 {

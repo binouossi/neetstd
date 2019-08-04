@@ -4,13 +4,34 @@
 
 net::net(std::string conf)
 {
-    this->configuration=nt_config(conf);
+    if(!conf.find("$\/\no data")==0)
+        this->configuration=config_reader(conf);
+
+    //clear address structus
+    memset(&this->local_addr, 0, sizeof(struct sockaddr_in));
+    memset(&this->peer_addr, 0, sizeof(struct sockaddr_in));
+
 }
+/*
+template <typename T>
+T net::get_addr_l()
+{
+    if(this->configuration.stat)
+        return htonl(*this->configuration.addr);
+
+     if(this->ip==IPV4)
+         return htonl(INADDR_ANY);
+
+     if(this->ip==IPV6)
+         return (const struct in6_addr)in6addr_any;
+}
+*/
 
 char* net::str_reader()
 {
 
         int n = NULL;
+
         this->int_reader(&n);
 
         if(n==0||n==NULL)
@@ -42,7 +63,7 @@ char* net::str_reader()
         if(this->prot==UDP)
         {
                 a = recvfrom(this->sock, lu, n,
-                            MSG_WAITALL, ( struct sockaddr *) &peer_addr,
+                            MSG_WAITALL, ( struct sockaddr *) &peer_addr4,
                             NULL);
         }
 
@@ -91,9 +112,9 @@ char* net::str_reader(int n)
         }
         if(this->prot==UDP)
         {
-            int len;
+//            int len;
                 a = recvfrom(this->sock, lu, n,
-                            MSG_WAITALL, ( struct sockaddr *) &peer_addr,
+                            MSG_WAITALL, ( struct sockaddr *) &peer_addr4,
                             NULL);
         }
 
@@ -114,6 +135,7 @@ char* net::str_reader(int n)
     {
 
     }
+    return NULL;
 }
 
 int net::str_sender(char* fi)
@@ -136,7 +158,7 @@ int net::str_sender(char* fi)
     {
 
     }
-
+    return 0;
 }
 
 int net::str_sender(char* fi,int size)
@@ -152,7 +174,7 @@ int net::str_sender(char* fi,int size)
         if(this->prot==UDP)
         {
             n=sendto(this->sock, fi, size,
-                     MSG_CONFIRM, (const struct sockaddr *) &this->peer_addr,
+                     MSG_CONFIRM, (const struct sockaddr *) &this->peer_addr4,
                          NULL);
         }
 
