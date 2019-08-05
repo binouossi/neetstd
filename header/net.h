@@ -7,6 +7,7 @@
 
 constexpr int IPV4 = 4;
 constexpr int IPV6 = 6;
+constexpr int _4_6 = 46;
 
 constexpr char* TCP = "TCP";
 constexpr char* UDP = "UDP";
@@ -43,12 +44,14 @@ class net// : public istringstream
 {
 public:
 
-    net(std::string);
+    net(char*, char*, bool);
     template <typename Type>
     std::string operator<<(Type data);
 
     template <typename Type>
     std::string operator>>(Type& data);
+
+    void config_set(char*,char*, char*);
 
 
 
@@ -66,25 +69,33 @@ protected:
 
     auto get_addr_l();//return address usefull for socket struct
 
+    struct addrinfo *local_i_addr;
+
+    bool server;
 
     con configuration;
 
     char ip;
+
+
 
     //addr
     sockaddr_storage *peer_addr;
     sockaddr_storage *local_addr;
 
 
-//ipv4 address
-   struct sockaddr_in local_addr4;
+    int p_sock;
 
-    struct sockaddr_in peer_addr4;
+
+//ipv4 address
+ //  struct sockaddr_in local_addr4;
+
+  //  struct sockaddr_in peer_addr4;
 
     //ipv6 address
-    struct sockaddr_in6 local_addr6;
+ //   struct sockaddr_in6 local_addr6;
 
-    struct sockaddr_in6 peer_addr6;
+//    struct sockaddr_in6 peer_addr6;
 
 
 

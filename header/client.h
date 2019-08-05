@@ -10,7 +10,7 @@ class NTSTDSHARED_EXPORT client : public net
 {
 
 public:
-    client(std::string conf ,std::string prot);
+    client(char* conf ,char* prot);
 
     ~client();
 

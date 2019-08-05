@@ -47,10 +47,13 @@ con config_reader(string conf)
 
               if(key.find("PORT")==0)
               {
+                 //value.flush();
                   if( getline(line, value) )
                   {
-                      stringstream ki(value);
-                    ki>>config.port;
+
+                      config.port=strdup(value.c_str());
+                 //     stringstream ki(value);
+                 //   ki>>config.port;
                     port=true;
                   }
               }

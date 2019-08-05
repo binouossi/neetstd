@@ -1,9 +1,9 @@
 #include "client.h"
 
 
-client::client(std::string conf= "$\/\no data", std::string prot=TCP):net(conf)
+client::client(char* conf, char* prot):net(conf, prot, false)
 {
-    this->prot=prot;
+ /*   this->prot=prot;
 
     if(this->prot==TCP)
     {
@@ -32,8 +32,11 @@ client::client(std::string conf= "$\/\no data", std::string prot=TCP):net(conf)
       this->peer_addr4.sin_family = AF_INET;
       this->peer_addr4.sin_port = htons(this->configuration.port);
       this->peer_addr4.sin_addr.s_addr = inet_addr( this->configuration.addr );
+*/
 
-      if(connect(this->sock, (struct sockaddr *)&this->peer_addr4, sizeof(this->peer_addr4))<0)
+    this->sock=this->p_sock;
+    //this->local_addr= this->local_i_addr;
+      if(connect(this->sock, this->local_i_addr->ai_addr, this->local_i_addr->ai_addrlen)<0)
         {
           perror("Error : Connect Failed");
           exit(-1);

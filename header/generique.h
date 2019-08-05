@@ -21,8 +21,8 @@
 // it act as operation control variable
 
 struct con{
-    char* addr;
-    int port;
+    char* addr=NULL;
+    char* port=NULL;
     bool stat=false;
 };
 

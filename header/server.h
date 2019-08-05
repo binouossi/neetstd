@@ -23,13 +23,13 @@ class NTSTDSHARED_EXPORT server : public net
 {
 
 public:
-    server(std::string conf, std::string prot, int deamon, void *(*communicator)(server, va_list&), ...);
+ //   server(char* conf, char* prot, int deamon, void *(*communicator)(server, va_list&), ...);
 
-    server(std::string conf, int deamon, void *(*communicator)(server, va_list&), ...);
+//    server(char* conf, int deamon, void *(*communicator)(server, va_list&), ...);
 
-    server(std::string conf, std::string prot, void *(*communicator)(server, va_list&), ...);
+    server(char* conf, char* prot, void *(*communicator)(server, va_list&), ...);
 
-    server(std::string conf, void *(*communicator)(server, va_list&), ...);
+//    server(char* conf, void *(*communicator)(server, va_list&), ...);
 
     ~server();
 
@@ -38,7 +38,7 @@ private:
    struct sockaddr_storage  listen_addr;
    char* service_name;
 
-//   auto UDP_data();
+//    std::stringstream udp_data;
 
 protected:
 
