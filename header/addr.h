@@ -6,18 +6,18 @@
 
 //#define ip(type)
 
-
+/*
 
 
 
 #define IPV6_REST( hi ) \
- //   hi==AF_INET6? : uint32_t sin6_flowinfo \ 	/* IPv6 flow information */
- //   &&       uint32_t sin6_scope_id;	/* IPv6 scope-id */;
+ //   hi==AF_INET6? : uint32_t sin6_flowinfo \ 	// IPv6 flow information
+ //   &&       uint32_t sin6_scope_id;	/* IPv6 scope-id ;
 /*
 #define IPV6_REST( hi )\
         hi == AF_INET6 ?  :
-        uint32_t sin6_flowinfo;	/* IPv6 flow information */
- //       uint32_t sin6_scope_id;	/* IPv6 scope-id */
+        uint32_t sin6_flowinfo;	// IPv6 flow information
+ //       uint32_t sin6_scope_id;	// IPv6 scope-id
 
 
 
@@ -27,7 +27,7 @@ typedef union addr_
     struct sockaddr_in6  _6;
     struct sockaddr_in  _4;
 } addr_;
-*/
+
 
 
 class addr_h
@@ -68,14 +68,14 @@ private:
 
     //ipv4
  //   __SOCKADDR_COMMON (sin_);
-//    in_port_t sin_port;			/* Port number.  */
-//    struct in_addr sin_addr;		/* Internet address.  */
+//    in_port_t sin_port;			// Port number.
+//    struct in_addr sin_addr;		// Internet address.
 
-    /* Pad to size of `struct sockaddr'.  */
-  /*  unsigned char sin_zero[sizeof (struct sockaddr) -
+    // Pad to size of `struct sockaddr'.  //
+  //  unsigned char sin_zero[sizeof (struct sockaddr) -
                __SOCKADDR_COMMON_SIZE -
                sizeof (in_port_t) -
-               sizeof (struct in_addr)];*/
+               sizeof (struct in_addr)];
 
 
     IPV6_REST(sin)
@@ -85,15 +85,15 @@ private:
 //ipv6
 
 //    __SOCKADDR_COMMON (sin6_);
-//    in_port_t sin6_port;	/* Transport layer port # */
-//    struct in6_addr sin6_addr;	/* IPv6 address */
+//    in_port_t sin6_port;	// Transport layer port #
+//    struct in6_addr sin6_addr;	// IPv6 address
 
-//    uint32_t sin6_flowinfo;	/* IPv6 flow information */
-//    uint32_t sin6_scope_id;	/* IPv6 scope-id */
+//    uint32_t sin6_flowinfo;	// IPv6 flow information
+//    uint32_t sin6_scope_id;	// IPv6 scope-id
 
 
 
 
 };
-
+*/
 #endif // ADDR_H

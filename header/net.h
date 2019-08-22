@@ -9,6 +9,7 @@ constexpr int IPV4 = 4;
 constexpr int IPV6 = 6;
 constexpr int _4_6 = 46;
 
+
 constexpr char* TCP = "TCP";
 constexpr char* UDP = "UDP";
 
@@ -27,29 +28,45 @@ constexpr char* UDP = "UDP";
 #include <sys/socket.h>
 #include <netdb.h>
 
+#include<string>
+
 
 
 //local header
 
-#include"addr.h"
+//#include"addr.h"
 #include"generique.h"
 
-
+/*
 typedef enum family{
     ipv4=4,
     ipv6=6
 }family;
+*/
+/*template <class charT,
+class traits = char_traits<charT>,
+class Allocator = allocator<charT> >*/
 
-class net// : public istringstream
+//template <typename _CharT, typename _Traits, typename _Alloc>
+class net //: protected std::stringstream
 {
 public:
 
     net(char*, char*, bool);
-    template <typename Type>
-    std::string operator<<(Type data);
+    ~net();
+ //   template <typename Type>
+ //   std::string operator<<(Type data);
 
     template <typename Type>
-    std::string operator>>(Type& data);
+    std::stringstream operator>>(Type& data);
+
+    template <typename Type>
+    std::stringstream operator<<(Type& data);
+
+//    template <class charT, class Traits>
+//    std::basic_iostream<charT, Traits> &operator<<(
+//    std::basic_iostream<charT, Traits> &flux);
+
 
     void config_set(char*,char*, char*);
 
@@ -69,22 +86,22 @@ protected:
 
     auto get_addr_l();//return address usefull for socket struct
 
-    struct addrinfo *local_i_addr;
+//    struct addrinfo *local_addr;
 
-    bool server;
+    // bool server;
 
     con configuration;
 
-    char ip;
+    char ip_v;
 
 
 
     //addr
-    sockaddr_storage *peer_addr;
-    sockaddr_storage *local_addr;
+    struct addrinfo *peer_addr;
+    struct addrinfo *local_addr;
 
 
-    int p_sock;
+ //   int p_sock;
 
 
 //ipv4 address
@@ -100,6 +117,7 @@ protected:
 
 
     int sock;
+
     std::string prot;
 
 
@@ -116,57 +134,140 @@ private:
 
     int str_sender(char* fi, int size);
 
-
-
+    int unit_data_sender(int q, char* buf);
 
 };
 
 
 
-template <typename Type>
-std::string net::operator>> (Type& don)
+// network communication operator
+
+/*
+template <class charT, class Traits>
+std::basic_iostream<charT, Traits> &net::operator<<(
+std::basic_iostream<charT, Traits> &flux)
 {
-    int size=NULL;
+    // Inialisation du flux de sortie :
+    typename std::basic_iostream<charT, Traits>::sentry init(flux);
+    if (init)
+    {
+    // Écriture des données :
+//        int Metres = p.Taille / 100;
+  //      int Reste = p.Taille % 100;
+    //    flux << p.Prenom << " " << p.Nom <<
+      //  " mesure " << Metres <<
+        //"m" << Reste << " (" <<
+ //       p.Age << " an";
+   //     if (p.Age > 1) flux << "s";
+     //   flux << ")";
+
+        char* buf=strdup(flux.str().c_str());
+
+        int size=strlen(buf);
+
+    //    std::cout<<buf<<std::endl;
+
+        if(this->str_sender(buf,size)<0)
+        {
+          //  buf=NULL;
+          //  return buf;
+        }
+
+
+    }
+    return flux;
+}
+*/
+
+
+
+
+
+template <typename Type>
+std::stringstream net::operator>> (Type& don)
+{
+    int tour=0;
 
     std::stringstream nin;
 
     nin.flush();
 
-    this->int_reader(&size);
+    char* data_tmp;
 
-    char* data= this->str_reader(size);
+    this->int_reader(&tour);
+
+    for(int i=0; i<tour; i++)
+    {
+        data_tmp=this->str_reader(BUFFER_SIZE);
+//        std::cout<<data_tmp<<std::endl;
+        nin<<data_tmp;
+    }
+
+ //   char* data= this->str_reader(size);
 
 //    std::cout<<data<<std::endl;
 
-    nin<<data;
+//    nin<<data;
+
+    strchr(data_tmp,' ')==NULL ? nin>>don : getline(nin,don);
 
     nin>>don;
 
-    return nin.str();
+//    std::cout<<don<<std::endl;
+
+    return nin;
 }
 
 
 template <typename Type>
-std::string net::operator<<(Type data)
+std::stringstream net::operator<<(Type& data)
 {
-    std::stringstream nout;
+    std::stringstream nout(data);
 
-    nout<<data;
+//    nout<<data;
 
     char* buf=const_cast<char*>(nout.str().c_str());
 
     int size=strlen(buf);
+    int t=0, j=0;
 
-    std::cout<<buf<<std::endl;
+    t=(int)(size%BUFFER_SIZE==0 ? size/BUFFER_SIZE : (size/BUFFER_SIZE)+1);
 
-    if(this->str_sender(buf,size)<0)
+    int_sender(t);
+
+
+    char tmp[BUFFER_SIZE];
+
+    if(int(size/BUFFER_SIZE)>0)
     {
-        buf=NULL;
-        return buf;
+        for(int i=0;i<t;i++)
+        {
+            for(int k=0;k<=BUFFER_SIZE;k++)
+            {
+                tmp[k]=buf[j];
+                j++;
+            }
+            int y=sizeof(tmp);
+            this->str_sender(tmp,y);
+        }
     }
 
-    return buf;
+
+    int y=size%BUFFER_SIZE;
+    char tm[y];
+
+    for(int k=0;k<=y;k++)
+    {
+        tm[k]=buf[j];
+        j++;
+    }
+
+    this->str_sender(tm,y);
+
+    return nout;
 }
+
+
 
 
 

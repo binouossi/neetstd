@@ -75,8 +75,6 @@ con config_reader(string conf)
     return config;
 }
 
-
-
 void config_reader(string conf, auto &config)
 {
 
@@ -195,7 +193,14 @@ void value_reader(std::string path,std::string key,auto &valu)
     return;
 }
 
+/*
 
+int tour(int size)
+{
+    int  hi=size/BUFFER_SIZE;
+    size%BUFFER_SIZE==0 ? return hi : return hi++;
+}
+*/
 
 
 // not used

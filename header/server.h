@@ -23,11 +23,11 @@ class NTSTDSHARED_EXPORT server : public net
 {
 
 public:
- //   server(char* conf, char* prot, int deamon, void *(*communicator)(server, va_list&), ...);
+    server(char* conf, char* prot, void *(*communicator)(server, va_list&), ...);
+
+//    server(char* conf, char* prot, int deamon, void *(*communicator)(server, va_list&), ...);
 
 //    server(char* conf, int deamon, void *(*communicator)(server, va_list&), ...);
-
-    server(char* conf, char* prot, void *(*communicator)(server, va_list&), ...);
 
 //    server(char* conf, void *(*communicator)(server, va_list&), ...);
 
@@ -35,14 +35,14 @@ public:
 
 private:
     int deamon;
-   struct sockaddr_storage  listen_addr;
-   char* service_name;
+ //  struct sockaddr_storage  listen_addr;
+//   char* service_name;
 
 //    std::stringstream udp_data;
 
 protected:
 
-    const struct sockaddr_in* addr;
+//    const struct sockaddr_in* addr;
 
 
 

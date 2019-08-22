@@ -2,6 +2,7 @@
 #ifndef GENERIQUE_H
 #define GENERIQUE_H
 
+constexpr int BUFFER_SIZE=1000;
 
 
 #include<fstream>
@@ -35,6 +36,8 @@ void config_reader(std::string conf, auto &config);
 auto get_value(con&,bool&,std::istringstream&);
 
 void value_reader(std::string path,std::string key,auto &valu);
+
+int tour(int);
 
 
 #endif // GENERIQUE_H

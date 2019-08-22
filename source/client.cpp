@@ -3,44 +3,24 @@
 
 client::client(char* conf, char* prot):net(conf, prot, false)
 {
- /*   this->prot=prot;
+
+//    this->sock=this->p_sock;
 
     if(this->prot==TCP)
     {
+        //this->local_addr= this->local_i_addr;
+          if(connect(this->sock, this->peer_addr->ai_addr, this->peer_addr->ai_addrlen)<0)
+            {
+              perror("Error : Connect Failed");
+              exit(-1);
+            }
+    }
 
-      if((this->sock = socket(AF_INET, SOCK_STREAM, 0))< 0)
-        {
-          perror("Error : Could not create socket \n");
-        }
-    }else
-        if(this->prot==UDP)
-        {
-            if((this->sock = socket(AF_INET, SOCK_DGRAM, 0))< 0)
-              {
-                perror("Error : Could not create socket \n");
-              }
-        }
+    if(this->prot==UDP)
+    {
+        addrinfo hi;
 
-    //this->peer_addr.sin=AF_INET;
-    //this->peer_addr.
-
-//    this->peer_addr.sin6_family=AF_INET;
-
-
-    //this->peer_addr.local._4.sin_family;
-
-      this->peer_addr4.sin_family = AF_INET;
-      this->peer_addr4.sin_port = htons(this->configuration.port);
-      this->peer_addr4.sin_addr.s_addr = inet_addr( this->configuration.addr );
-*/
-
-    this->sock=this->p_sock;
-    //this->local_addr= this->local_i_addr;
-      if(connect(this->sock, this->local_i_addr->ai_addr, this->local_i_addr->ai_addrlen)<0)
-        {
-          perror("Error : Connect Failed");
-          exit(-1);
-        }
+    }
 
 
 }
@@ -71,7 +51,7 @@ client::~client()
 {
     if(close(this->sock)==0)
     {
-        std::fprintf(OUTPUT,"connection ended\n" , strerror(errno));
+//        std::fprintf(OUTPUT,"connection ended\n" , strerror(errno));
 
     }
 

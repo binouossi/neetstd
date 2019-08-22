@@ -4,12 +4,6 @@
 
 net::net(char* conf, char* prot, bool server)
 {
-/*    if(this->configuration.stat==false)
-        if(!conf.find("$\/\no data")==0)
-            this->configuration=config_reader(conf);
-*/
-
-    this->server=server;
 
     this->config_set(conf, NULL,NULL);
 
@@ -17,23 +11,25 @@ net::net(char* conf, char* prot, bool server)
     memset(&this->local_addr, 0, sizeof(struct sockaddr_in));
     memset(&this->peer_addr, 0, sizeof(struct sockaddr_in));
 
-
     //socket creation
 
-    this->ip=IPV4;
+    this->ip_v=IPV4;
     this->prot=prot;
 
     // ip version independant handle
 
-    struct addrinfo hints;
+    struct addrinfo *result, *rp, hints;
     memset(&hints, 0, sizeof(struct addrinfo));
+    memset(&result, 0, sizeof(struct addrinfo*));
+    memset(&rp, 0, sizeof(struct addrinfo*));
+
 
     // control used address family
-    if(this->ip==IPV4)
+    if(this->ip_v==IPV4)
         hints.ai_family = AF_INET;    // Allow IPv4
-    if(this->ip==IPV6)
+    if(this->ip_v==IPV6)
         hints.ai_family = AF_INET6;    // Allow IPv6
-    if(this->ip==_4_6)
+    if(this->ip_v==_4_6)
         hints.ai_family = AF_UNSPEC;    // Allow IPv4 or IPv6
 
     // controle socket type: TCP or UDP
@@ -43,18 +39,18 @@ net::net(char* conf, char* prot, bool server)
         hints.ai_socktype = SOCK_DGRAM; // Datagram socket
 
 
-    if(this->server)
+    if(server)
         hints.ai_flags = AI_PASSIVE;    // For wildcard IP address
+
     hints.ai_protocol = 0;          // Any protocol
     hints.ai_canonname = NULL;
     hints.ai_addr = NULL;
     hints.ai_next = NULL;
 /*
-    if(this->server)
+    if(server)
         this->configuration.addr=NULL;
 */
 
-    struct addrinfo *result, *rp;
 
 
  //   char port[]="5000";
@@ -76,12 +72,28 @@ net::net(char* conf, char* prot, bool server)
                    if (listenfd == -1)
                        continue;
 
-                   this->local_i_addr=rp;
-                   this->p_sock=listenfd;
+                   //suit=rp;
+                   if(server)
+                       this->local_addr=rp;
+                   else
+                       this->peer_addr=rp;
+
+
+                   this->sock=listenfd;
                    break;
     }
 
+//    freeaddrinfo(result);
+ //   freeaddrinfo(hints);
+ //   freeaddrinfo(rp);
+}
 
+
+
+net::~net()
+{
+    freeaddrinfo(this->local_addr);
+    freeaddrinfo(this->peer_addr);
 }
 
 
@@ -114,7 +126,18 @@ void net::config_set(char* path,char* addr, char* port)
 
 }
 
-
+int net::unit_data_sender(int q, char* buf)
+{
+    char tmp[q];
+    for(int k=0;k<=q;k++)
+    {
+        //tmp[k]=buf[j];
+     //   j++;
+    }
+    int y=sizeof(tmp);
+    this->str_sender(tmp,y);
+    return 0;
+}
 
 /*
 template <typename T>
@@ -158,17 +181,17 @@ char* net::str_reader()
     //    int a=this->readLine(lu,n);
         int a;
 
-        if(this->prot==TCP)
-        {
+  //      if(this->prot==TCP)
+  //      {
 
             a=recv(this->sock,lu,n,0);
-        }
-        if(this->prot==UDP)
-        {
+//        }
+//        if(this->prot==UDP)
+//        {
                 a = recvfrom(this->sock, lu, n,
-                            MSG_WAITALL, ( struct sockaddr *) &peer_addr,
-                            NULL);
-        }
+                            MSG_WAITALL, this->peer_addr->ai_addr,
+                            &this->peer_addr->ai_addrlen);
+//        }
 
           if( a < n-1)
           {
@@ -183,15 +206,16 @@ char* net::str_reader()
 
 char* net::str_reader(int n)
 {
-    if(this->prot==TCP)
-    {
+ //   if(this->prot==TCP)
+ //   {
 
+//    char lu[n];
         char* lu=NULL;
 
-        if(n==0||n==NULL)
-        {
-            return NULL;
-        }
+///        if(n==0||n==NULL)
+//        {
+//            return NULL;
+//        }
 
         lu=(char*)std::realloc(lu,(n*sizeof(char)));
 
@@ -202,41 +226,49 @@ char* net::str_reader(int n)
             return NULL;
         }
 
+ //       memset(&lu, 0, n*sizeof(char));
+
         lu[0]='\0';
 
     //    int a=this->readLine(lu,n);
-        int a;
-
+//        int a;
+/*
         if(this->prot==TCP)
         {
 
             a=recv(this->sock,lu,n,0);
         }
         if(this->prot==UDP)
-        {
+        {*/
 //            int len;
-                a = recvfrom(this->sock, lu, n,
-                            MSG_WAITALL, ( struct sockaddr *) &peer_addr,
-                            NULL);
-        }
+         //       a = recvfrom(this->sock, lu, n,
+         //                   MSG_WAITALL, this->peer_addr->ai_addr,
+         //                   &this->peer_addr->ai_addrlen);
+ //       }
 
-          if( a < n-1)
+          if( recvfrom(this->sock, lu, n,
+                          0, this->peer_addr->ai_addr,
+                          &this->peer_addr->ai_addrlen) < 0)
           {
+//                std::cout<<lu<<std::endl;
 
-              std::fprintf(OUTPUT,"Read Error" , strerror(errno));
+              perror("Read Error");
 
             return NULL;
           }
 
           lu[n]='\0';
+
+//          std::cout<<lu<<std::endl;
+
           return lu;
 
-    }
+  //  }
 
-    if(this->prot==UDP)
+  /*  if(this->prot==UDP)
     {
 
-    }
+    }*/
     return NULL;
 }
 
@@ -251,8 +283,8 @@ int net::str_sender(char* fi)
 
         int n=send(this->sock,fi,a,0);
 
-        if(n<0)
-            perror("Error while sending");
+       // if(n<0)
+         //   perror("Error while sending");
         return n;
     }
 
@@ -266,22 +298,14 @@ int net::str_sender(char* fi)
 int net::str_sender(char* fi,int size)
 {
 
-
-        this->int_sender(size);
     int n;
-    if(this->prot==TCP)
-    {
-        n=send( this->sock , fi , size, 0 );
-    }else
-        if(this->prot==UDP)
-        {
-            n=sendto(this->sock, fi, size,
-                     MSG_CONFIRM, (const struct sockaddr *) &this->peer_addr,
-                         NULL);
-        }
 
-        if(n<0)
-            perror("Error while sending");
+            if((n=sendto(this->sock, fi, sizeof fi,
+                     0, (const struct sockaddr *) &this->peer_addr->ai_addr,
+                         NULL))<0)
+            {
+                perror("Error while sending");
+            }
         return n;
 
 }
@@ -289,7 +313,7 @@ int net::str_sender(char* fi,int size)
 int net::int_reader(int* num)
 {
 
-    if(this->prot==TCP)
+ /*   if(this->prot==TCP)
     {
 
         char buf[10] = "";
@@ -302,9 +326,20 @@ int net::int_reader(int* num)
     }
 
     if(this->prot==UDP)
-    {
+    {*/
+        char buf[10] = "";
 
-    }
+        int rest=0;
+        if((rest=recvfrom( this->sock , buf , sizeof buf , MSG_WAITALL,
+                           this->peer_addr->ai_addr, &this->peer_addr->ai_addrlen))<0)
+        {
+            perror("Error while receving: ");
+        }
+
+        sscanf( buf , "%d" , num );
+
+        return rest;
+  //  }
 
 
 }
@@ -312,23 +347,29 @@ int net::int_reader(int* num)
 int net::int_sender(int num)
 {
 
-    if(this->prot==TCP)
-    {
+//    if(this->prot==TCP)
+//    {
 
         char buf[10] = "";
 
         sprintf( buf , "%d" , num );
 
-        int rest=send( this->sock , buf , sizeof buf , 0 );
+        int rest=0;
+
+        if((rest=sendto( this->sock , buf , sizeof(buf) , 0 ,
+                         this->peer_addr->ai_addr, this->peer_addr->ai_addrlen))<0)
+        {
+            perror("Eroor while sending");
+        }
 
         return rest;
-    }
-
+  //  }
+/*
     if(this->prot==UDP)
     {
 
     }
-
+*/
 
 }
 
